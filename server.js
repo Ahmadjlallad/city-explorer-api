@@ -38,7 +38,7 @@ server.get("/weather", (req, res) => {
 });
 server.get("*", (req, res) => {
   console.log("hi servers");
-  res.status(404);
+  res.status(404).send("Not found");
 });
 server.listen(PORT, () => {
   console.log(`Hello, I am listening on ${PORT}`);
