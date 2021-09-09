@@ -2,6 +2,8 @@
 const { default: axios } = require("axios");
 const { getFilms } = require("./Helpers");
 // * Movies class and server fetch function + send response to client
+
+let myMemory = {};
 class Movies {
   constructor(
     title,
@@ -24,21 +26,26 @@ class Movies {
 
 function getMovies(query, ApiResponse) {
   const { key, name, page } = query;
-  axios
-    .get(`https://api.themoviedb.org/3/search/movie?`, {
-      params: {
-        api_key: key,
-        language: `en-US`,
-        page,
-        include_adult: false,
-        query: name,
-      },
-    })
-    .then((response) => {
-      ApiResponse.send(getFilms(response.data.results, Movies));
-    })
-    .catch((err) => {
-      ApiResponse.send(err.message);
-    });
+
+  if (myMemory[name] !== undefined) ApiResponse.send(myMemory[name]);
+  else {
+    axios
+      .get(`https://api.themoviedb.org/3/search/movie?`, {
+        params: {
+          api_key: key,
+          language: `en-US`,
+          page,
+          include_adult: false,
+          query: name,
+        },
+      })
+      .then((response) => {
+        ApiResponse.send(getFilms(response.data.results, Movies));
+        myMemory[name] = getFilms(response.data.results, Movies);
+      })
+      .catch((err) => {
+        ApiResponse.send(err.message);
+      });
+  }
 }
 module.exports = getMovies;
